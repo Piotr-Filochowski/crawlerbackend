@@ -64,7 +64,6 @@ public class ScrappingService {
         manageInformationEntities(requestPosition, response);
       } catch (IOException e) {
         log.info(requestPosition.getUrl() + " IOException with that");
-        continue;
       }
     }
   }
@@ -121,9 +120,7 @@ public class ScrappingService {
   private ScrappingResponse createResponse(RequestEntity requestEntity) {
     ScrappingResponse scrappingResponse = new ScrappingResponse();
     scrappingResponse.setUrlInfos(new LinkedList<>());
-    requestEntity.getRequestPositions().forEach(requestPosition -> {
-     scrappingResponse.getUrlInfos().add(mapRequestPositionToRespone(requestPosition));
-    });
+    requestEntity.getRequestPositions().forEach(requestPosition -> scrappingResponse.getUrlInfos().add(mapRequestPositionToRespone(requestPosition)));
     return scrappingResponse;
   }
 
@@ -133,12 +130,8 @@ public class ScrappingService {
     urlInfoResponse.setEntitties(new LinkedList<>());
     urlInfoResponse.setId(requestPosition.getRequestPositionId().toString());
     urlInfoResponse.setUrl(requestPosition.getUrl());
-    requestPosition.getContextEntities().forEach(context -> {
-      urlInfoResponse.getContext().add(context.getName());
-    });
-    requestPosition.getInformationEntities().forEach(informationEntity -> {
-      urlInfoResponse.getEntitties().add(mapEntityToResponse(informationEntity));
-    });
+    requestPosition.getContextEntities().forEach(context -> urlInfoResponse.getContext().add(context.getName()));
+    requestPosition.getInformationEntities().forEach(informationEntity -> urlInfoResponse.getEntitties().add(mapEntityToResponse(informationEntity)));
     return urlInfoResponse;
   }
 
@@ -149,9 +142,7 @@ public class ScrappingService {
     entityInfoResponse.setSalience(informationEntity.getSalience());
     entityInfoResponse.setType(informationEntity.getType());
     entityInfoResponse.setMetadata(new LinkedList<>());
-    informationEntity.getInformationMetadataEntities().forEach(metadataEntity -> {
-      entityInfoResponse.getMetadata().add(mapMetadataToResponse(metadataEntity));
-    });
+    informationEntity.getInformationMetadataEntities().forEach(metadataEntity -> entityInfoResponse.getMetadata().add(mapMetadataToResponse(metadataEntity)));
     return entityInfoResponse;
   }
 

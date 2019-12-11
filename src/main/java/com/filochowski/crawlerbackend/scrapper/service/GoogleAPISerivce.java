@@ -49,7 +49,7 @@ public class GoogleAPISerivce {
   /**
    * Identifies entities in the string {@code text}.
    */
-  public static void analyzeEntitiesText(String text) throws Exception {
+  private static void analyzeEntitiesText(String text) throws Exception {
     // [START language_entities_text]
     // Instantiate the Language client com.google.cloud.language.v1.LanguageServiceClient
     try (LanguageServiceClient language = LanguageServiceClient.create()) {
