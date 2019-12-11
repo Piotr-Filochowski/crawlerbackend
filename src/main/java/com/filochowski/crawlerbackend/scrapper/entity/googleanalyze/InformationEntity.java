@@ -41,6 +41,4 @@ public class InformationEntity {
 
   @Column(name ="salience")
   private Float salience;
-
-
 }

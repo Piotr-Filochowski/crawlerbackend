@@ -5,7 +5,11 @@ import com.filochowski.crawlerbackend.scrapper.entity.RequestPositionEntity;
 import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.ContextEntity;
 import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.InformationEntity;
 import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.InformationMetadataEntity;
+import com.filochowski.crawlerbackend.scrapper.model.EntityInfoMetadataResponse;
+import com.filochowski.crawlerbackend.scrapper.model.EntityInfoResponse;
 import com.filochowski.crawlerbackend.scrapper.model.ScrappingRequest;
+import com.filochowski.crawlerbackend.scrapper.model.ScrappingResponse;
+import com.filochowski.crawlerbackend.scrapper.model.UrlInfoResponse;
 import com.filochowski.crawlerbackend.scrapper.repository.RequestPositionRepository;
 import com.filochowski.crawlerbackend.scrapper.repository.RequestRepository;
 import com.google.cloud.language.v1.AnnotateTextResponse;
@@ -31,11 +35,11 @@ public class ScrappingService {
   private final RequestPositionRepository requestPositionRepository;
   private final GoogleAPISerivce googleAPISerivce;
 
-  public RequestEntity handleScrappingRequest(ScrappingRequest scrappingRequest){
+  public ScrappingResponse handleScrappingRequest(ScrappingRequest scrappingRequest){
     log.info(scrappingRequest.getTopic() + " " + scrappingRequest.getUrls().size());
     RequestEntity requestEntity = saveRequestToDatabase(scrappingRequest);
     manageRequest(requestEntity);
-    return requestEntity;
+    return createResponse(requestEntity);
   }
 
   private RequestEntity saveRequestToDatabase(ScrappingRequest scrappingRequest) {
@@ -112,6 +116,39 @@ public class ScrappingService {
       requestPosition.getInformationEntities().add(informationEntity);
     });
     requestPositionRepository.save(requestPosition);
+  }
+
+  private ScrappingResponse createResponse(RequestEntity requestEntity) {
+    ScrappingResponse scrappingResponse = new ScrappingResponse();
+    scrappingResponse.setUrlInfos(new LinkedList<>());
+    requestEntity.getRequestPositions().forEach(requestPosition -> {
+      UrlInfoResponse urlInfoResponse = new UrlInfoResponse();
+      urlInfoResponse.setContext(new LinkedList<>());
+      urlInfoResponse.setEntitties(new LinkedList<>());
+      urlInfoResponse.setId(requestPosition.getRequestPositionId().toString());
+      urlInfoResponse.setUrl(requestPosition.getUrl());
+      requestPosition.getContextEntities().forEach(context -> {
+        urlInfoResponse.getContext().add(context.getName());
+      });
+      requestPosition.getInformationEntities().forEach(informationEntity -> {
+        EntityInfoResponse entityInfoResponse = new EntityInfoResponse();
+        entityInfoResponse.setId(informationEntity.getInformationId().toString());
+        entityInfoResponse.setName(informationEntity.getName());
+        entityInfoResponse.setSalience(informationEntity.getSalience());
+        entityInfoResponse.setType(informationEntity.getType());
+        entityInfoResponse.setMetadata(new LinkedList<>());
+        informationEntity.getInformationMetadataEntities().forEach(metadataEntity -> {
+          EntityInfoMetadataResponse entityInfoMetadataResponse = new EntityInfoMetadataResponse();
+          entityInfoMetadataResponse.setId(metadataEntity.getIdMetadata().toString());
+          entityInfoMetadataResponse.setKey(metadataEntity.getKey());
+          entityInfoMetadataResponse.setValue(metadataEntity.getValue());
+          entityInfoResponse.getMetadata().add(entityInfoMetadataResponse);
+        });
+        urlInfoResponse.getEntitties().add(entityInfoResponse);
+      });
+     scrappingResponse.getUrlInfos().add(urlInfoResponse);
+    });
+    return scrappingResponse;
   }
 
 }
