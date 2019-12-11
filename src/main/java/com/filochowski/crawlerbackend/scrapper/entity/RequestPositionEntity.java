@@ -1,6 +1,10 @@
 package com.filochowski.crawlerbackend.scrapper.entity;
 
+import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.ContextEntity;
+import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.InformationEntity;
+import java.util.List;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -33,5 +37,13 @@ public class RequestPositionEntity {
 
   @Column(name ="url")
   private String url;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "id_request_position")
+  private List<ContextEntity> contextEntities;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumn(name = "id_request_position")
+  private List<InformationEntity> informationEntities;
 
 }

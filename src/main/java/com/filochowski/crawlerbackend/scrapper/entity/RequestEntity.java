@@ -1,6 +1,5 @@
 package com.filochowski.crawlerbackend.scrapper.entity;
 
-import com.sun.org.apache.xpath.internal.operations.String;
 import java.util.List;
 import java.util.UUID;
 import javax.persistence.CascadeType;
