@@ -122,33 +122,45 @@ public class ScrappingService {
     ScrappingResponse scrappingResponse = new ScrappingResponse();
     scrappingResponse.setUrlInfos(new LinkedList<>());
     requestEntity.getRequestPositions().forEach(requestPosition -> {
-      UrlInfoResponse urlInfoResponse = new UrlInfoResponse();
-      urlInfoResponse.setContext(new LinkedList<>());
-      urlInfoResponse.setEntitties(new LinkedList<>());
-      urlInfoResponse.setId(requestPosition.getRequestPositionId().toString());
-      urlInfoResponse.setUrl(requestPosition.getUrl());
-      requestPosition.getContextEntities().forEach(context -> {
-        urlInfoResponse.getContext().add(context.getName());
-      });
-      requestPosition.getInformationEntities().forEach(informationEntity -> {
-        EntityInfoResponse entityInfoResponse = new EntityInfoResponse();
-        entityInfoResponse.setId(informationEntity.getInformationId().toString());
-        entityInfoResponse.setName(informationEntity.getName());
-        entityInfoResponse.setSalience(informationEntity.getSalience());
-        entityInfoResponse.setType(informationEntity.getType());
-        entityInfoResponse.setMetadata(new LinkedList<>());
-        informationEntity.getInformationMetadataEntities().forEach(metadataEntity -> {
-          EntityInfoMetadataResponse entityInfoMetadataResponse = new EntityInfoMetadataResponse();
-          entityInfoMetadataResponse.setId(metadataEntity.getIdMetadata().toString());
-          entityInfoMetadataResponse.setKey(metadataEntity.getKey());
-          entityInfoMetadataResponse.setValue(metadataEntity.getValue());
-          entityInfoResponse.getMetadata().add(entityInfoMetadataResponse);
-        });
-        urlInfoResponse.getEntitties().add(entityInfoResponse);
-      });
-     scrappingResponse.getUrlInfos().add(urlInfoResponse);
+     scrappingResponse.getUrlInfos().add(mapRequestPositionToRespone(requestPosition));
     });
     return scrappingResponse;
+  }
+
+  private UrlInfoResponse mapRequestPositionToRespone(RequestPositionEntity requestPosition){
+    UrlInfoResponse urlInfoResponse = new UrlInfoResponse();
+    urlInfoResponse.setContext(new LinkedList<>());
+    urlInfoResponse.setEntitties(new LinkedList<>());
+    urlInfoResponse.setId(requestPosition.getRequestPositionId().toString());
+    urlInfoResponse.setUrl(requestPosition.getUrl());
+    requestPosition.getContextEntities().forEach(context -> {
+      urlInfoResponse.getContext().add(context.getName());
+    });
+    requestPosition.getInformationEntities().forEach(informationEntity -> {
+      urlInfoResponse.getEntitties().add(mapEntityToResponse(informationEntity));
+    });
+    return urlInfoResponse;
+  }
+
+  private EntityInfoResponse mapEntityToResponse(InformationEntity informationEntity){
+    EntityInfoResponse entityInfoResponse = new EntityInfoResponse();
+    entityInfoResponse.setId(informationEntity.getInformationId().toString());
+    entityInfoResponse.setName(informationEntity.getName());
+    entityInfoResponse.setSalience(informationEntity.getSalience());
+    entityInfoResponse.setType(informationEntity.getType());
+    entityInfoResponse.setMetadata(new LinkedList<>());
+    informationEntity.getInformationMetadataEntities().forEach(metadataEntity -> {
+      entityInfoResponse.getMetadata().add(mapMetadataToResponse(metadataEntity));
+    });
+    return entityInfoResponse;
+  }
+
+  private EntityInfoMetadataResponse mapMetadataToResponse(InformationMetadataEntity metadataEntity) {
+    EntityInfoMetadataResponse entityInfoMetadataResponse = new EntityInfoMetadataResponse();
+    entityInfoMetadataResponse.setId(metadataEntity.getIdMetadata().toString());
+    entityInfoMetadataResponse.setKey(metadataEntity.getKey());
+    entityInfoMetadataResponse.setValue(metadataEntity.getValue());
+    return entityInfoMetadataResponse;
   }
 
 }
