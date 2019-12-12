@@ -13,6 +13,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true) // INFO: aktywacja anotacji uzywanych w Controllerach
@@ -46,11 +50,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
+
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.addAllowedOrigin("*");
+    configuration.addAllowedHeader("*");
+    configuration.addAllowedMethod("GET");
+    configuration.addAllowedMethod("PUT");
+    configuration.addAllowedMethod("POST");
+    source.registerCorsConfiguration("/**", configuration);
+    CorsFilter corsFilter = new CorsFilter(source);
+
     http
         // INFO: Kontrola tworzenia sesji, dzieki uzyciu NEVER lub STATELESS mamy pewnosc ze Spring nie uzyje automagicznej propagacji sesji poprzez JSESSIONID.
         // My jednak uzyjemy teraz ALWAYS, bo mechanizm autentykacji i autoryzacji w tym przykladzie polega wlasnie na JSESSIONID
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
-
+        .addFilterBefore(corsFilter, LogoutFilter.class)
         // INFO: kilka zabezpieczen
         .headers() // konfiguruje zabezpieczenia oparte o headery
         .cacheControl().and() // wylacza cachowanie

@@ -46,4 +46,7 @@ public class RequestPositionEntity {
   @JoinColumn(name = "id_request_position")
   private List<InformationEntity> informationEntities;
 
+  @Column(name = "success")
+  private Boolean success;
+
 }

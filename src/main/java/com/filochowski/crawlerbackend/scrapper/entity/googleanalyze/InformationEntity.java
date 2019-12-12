@@ -25,7 +25,7 @@ public class InformationEntity {
   @GeneratedValue(generator = "uuid")
   private UUID informationId;
 
-  @Column(name ="name")
+  @Column(name = "name", length = 2000)
   private String name;
 
   @Column(name ="type")

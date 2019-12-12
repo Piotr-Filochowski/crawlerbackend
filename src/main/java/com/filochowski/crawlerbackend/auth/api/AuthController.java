@@ -31,6 +31,7 @@ public class AuthController {
   @PreAuthorize("isAuthenticated()")
   @GetMapping("/logout")
   public void logout(HttpServletRequest request, HttpServletResponse response) {
+
     authService.logout(request, response);
   }
 }

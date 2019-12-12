@@ -24,8 +24,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -43,10 +44,14 @@ public class ScrappingService {
   }
 
   private RequestEntity saveRequestToDatabase(ScrappingRequest scrappingRequest) {
+    String username = getUsername();
     RequestEntity requestEntity = new RequestEntity();
     requestEntity.setRequestPositions(new LinkedList<>());
     requestEntity.setTopic(scrappingRequest.getTopic());
     for (String url : scrappingRequest.getUrls()) {
+      if (url.length() == 0 || url == null) {
+        continue;
+      }
       RequestPositionEntity requestPositionEntity = new RequestPositionEntity();
       requestPositionEntity.setUrl(url);
       requestPositionEntity.setRequestEntity(requestEntity);
@@ -55,10 +60,27 @@ public class ScrappingService {
     return requestRepository.save(requestEntity);
   }
 
+  private String getUsername() {
+    Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    if (principal instanceof UserDetails) {
+      return ((UserDetails) principal).getUsername();
+    } else {
+      return principal.toString();
+    }
+  }
+
   private void manageRequest(RequestEntity requestEntity) {
     for (RequestPositionEntity requestPosition : requestEntity.getRequestPositions()) {
       try {
         String pageText = scrapPage(requestPosition.getUrl());
+        if (pageText == null) {
+          requestPosition.setInformationEntities(new LinkedList<>());
+          requestPosition.setContextEntities(new LinkedList<>());
+          requestPosition.setSuccess(Boolean.FALSE);
+          continue;
+        } else {
+          requestPosition.setSuccess(Boolean.TRUE);
+        }
         AnnotateTextResponse response = googleAPISerivce.annotateText(pageText);
         manageCategories(requestPosition, response);
         manageInformationEntities(requestPosition, response);
@@ -83,15 +105,20 @@ public class ScrappingService {
   }
 
   private String scrapPage(String url) throws IOException {
-    Document doc = Jsoup.connect(url).get();
-    Elements elements = doc.children().select("*");
-    StringBuilder stringBuilder = new StringBuilder();
-    for (Element el : elements) {
-      if (el.hasText() /*&& el.ownText().length() > 1*/) {
-        stringBuilder.append(el.ownText() + " ");
+    try {
+      Document doc = Jsoup.connect(url).get();
+      Elements elements = doc.children().select("*");
+      StringBuilder stringBuilder = new StringBuilder();
+      for (Element el : elements) {
+        if (el.hasText() /*&& el.ownText().length() > 1*/) {
+          stringBuilder.append(el.ownText() + " ");
+        }
       }
+      return stringBuilder.toString();
+    } catch (Exception e) {
+      log.error(url + " page content wasnt occured");
+      return null;
     }
-    return stringBuilder.toString();
   }
 
   private void manageInformationEntities(RequestPositionEntity requestPosition, AnnotateTextResponse response) {
@@ -101,7 +128,7 @@ public class ScrappingService {
     }
     entitiesList.forEach(entity -> {
       InformationEntity informationEntity = new InformationEntity();
-      informationEntity.setName(entity.getName());
+      informationEntity.setName(validateEntityNameLength(entity.getName()));
       informationEntity.setSalience(entity.getSalience());
       informationEntity.setType(entity.getType().name());
       informationEntity.setTypeDescription(entity.getType().getDescriptorForType().getFullName());
@@ -115,6 +142,13 @@ public class ScrappingService {
       requestPosition.getInformationEntities().add(informationEntity);
     });
     requestPositionRepository.save(requestPosition);
+  }
+
+  private String validateEntityNameLength(String name) {
+    if (name.length() > 2000) {
+      return name.substring(0, 1999);
+    }
+    return name;
   }
 
   private ScrappingResponse createResponse(RequestEntity requestEntity) {
