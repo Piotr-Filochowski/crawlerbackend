@@ -1,7 +1,9 @@
 package com.filochowski.crawlerbackend.scrapper.entity.googleanalyze;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,4 +43,11 @@ public class InformationEntity {
 
   @Column(name ="salience")
   private Float salience;
+
+  @PostConstruct
+  private void postConstruct() {
+    if (informationMetadataEntities == null) {
+      informationMetadataEntities = new LinkedList<>();
+    }
+  }
 }

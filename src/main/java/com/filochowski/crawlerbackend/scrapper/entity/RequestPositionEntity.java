@@ -2,8 +2,10 @@ package com.filochowski.crawlerbackend.scrapper.entity;
 
 import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.ContextEntity;
 import com.filochowski.crawlerbackend.scrapper.entity.googleanalyze.InformationEntity;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -48,5 +50,15 @@ public class RequestPositionEntity {
 
   @Column(name = "success")
   private Boolean success;
+
+  @PostConstruct
+  private void postConstruct() {
+    if (informationEntities == null) {
+      informationEntities = new LinkedList<>();
+    }
+    if (contextEntities == null) {
+      contextEntities = new LinkedList<>();
+    }
+  }
 
 }

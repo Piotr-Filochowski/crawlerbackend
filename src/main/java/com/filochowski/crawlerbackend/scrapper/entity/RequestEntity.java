@@ -1,7 +1,9 @@
 package com.filochowski.crawlerbackend.scrapper.entity;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,4 +33,12 @@ public class RequestEntity {
 
   @OneToMany(mappedBy = "requestEntity", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<RequestPositionEntity> requestPositions;
+
+
+  @PostConstruct
+  private void postConstruct() {
+    if (requestPositions == null) {
+      requestPositions = new LinkedList<>();
+    }
+  }
 }

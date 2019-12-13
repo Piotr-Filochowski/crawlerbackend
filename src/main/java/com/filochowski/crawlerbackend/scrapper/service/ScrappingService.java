@@ -45,6 +45,7 @@ public class ScrappingService {
 
   private RequestEntity saveRequestToDatabase(ScrappingRequest scrappingRequest) {
     String username = getUsername();
+    log.info("username: " + username);
     RequestEntity requestEntity = new RequestEntity();
     requestEntity.setRequestPositions(new LinkedList<>());
     requestEntity.setTopic(scrappingRequest.getTopic());
@@ -164,6 +165,9 @@ public class ScrappingService {
     urlInfoResponse.setEntitties(new LinkedList<>());
     urlInfoResponse.setId(requestPosition.getRequestPositionId().toString());
     urlInfoResponse.setUrl(requestPosition.getUrl());
+    if (requestPosition.getContextEntities() == null) {
+      requestPosition.setContextEntities(new LinkedList<>());
+    }
     requestPosition.getContextEntities().forEach(context -> urlInfoResponse.getContext().add(context.getName()));
     requestPosition.getInformationEntities().forEach(informationEntity -> urlInfoResponse.getEntitties().add(mapEntityToResponse(informationEntity)));
     return urlInfoResponse;
@@ -176,6 +180,9 @@ public class ScrappingService {
     entityInfoResponse.setSalience(informationEntity.getSalience());
     entityInfoResponse.setType(informationEntity.getType());
     entityInfoResponse.setMetadata(new LinkedList<>());
+    if (informationEntity.getInformationMetadataEntities() == null) {
+      informationEntity.setInformationMetadataEntities(new LinkedList<>());
+    }
     informationEntity.getInformationMetadataEntities().forEach(metadataEntity -> entityInfoResponse.getMetadata().add(mapMetadataToResponse(metadataEntity)));
     return entityInfoResponse;
   }

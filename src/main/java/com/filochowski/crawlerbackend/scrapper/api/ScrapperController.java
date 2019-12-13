@@ -6,6 +6,7 @@ import com.filochowski.crawlerbackend.scrapper.model.ScrappingResponse;
 import com.filochowski.crawlerbackend.scrapper.service.ScrappingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class ScrapperController {
 
   private final ScrappingService scrappingService;
 
+  @PreAuthorize("hasAuthority('USER') or hasAuthority('FULL_ACCESS')")
   @PostMapping
   public ScrappingResponse addScrappingRequest(@RequestBody ScrappingRequest scrappingRequest){
     return scrappingService.handleScrappingRequest(scrappingRequest);

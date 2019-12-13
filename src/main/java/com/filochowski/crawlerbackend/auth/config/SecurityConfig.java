@@ -53,8 +53,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("*");
+    configuration.addAllowedOrigin("http://localhost:3000");
     configuration.addAllowedHeader("*");
+    configuration.setAllowCredentials(true);
     configuration.addAllowedMethod("GET");
     configuration.addAllowedMethod("PUT");
     configuration.addAllowedMethod("POST");
@@ -62,18 +63,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsFilter corsFilter = new CorsFilter(source);
 
     http
-        // INFO: Kontrola tworzenia sesji, dzieki uzyciu NEVER lub STATELESS mamy pewnosc ze Spring nie uzyje automagicznej propagacji sesji poprzez JSESSIONID.
-        // My jednak uzyjemy teraz ALWAYS, bo mechanizm autentykacji i autoryzacji w tym przykladzie polega wlasnie na JSESSIONID
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
         .addFilterBefore(corsFilter, LogoutFilter.class)
-        // INFO: kilka zabezpieczen
-        .headers() // konfiguruje zabezpieczenia oparte o headery
-        .cacheControl().and() // wylacza cachowanie
-        .frameOptions().deny() // uniemozliwienie dostepu z ramek (np iFrame)
-        .xssProtection().xssProtectionEnabled(true).and() // ochrona przed atakami XSS
-        .contentTypeOptions().and() // zabezpieczenie przed sniffingiem
+        .headers()
+        .cacheControl().and()
+        .frameOptions().deny()
+        .xssProtection().xssProtectionEnabled(true).and()
+        .contentTypeOptions().and()
         .and()
-        .csrf().disable() // bez tego nie bedzie dzialac uzywanie czegokolwiek poza GETami z plikow .http
+        .csrf().disable()
     ;
   }
 }
