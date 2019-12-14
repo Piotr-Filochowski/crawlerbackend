@@ -24,7 +24,7 @@ public class PostConstructService {
   private void init() {
     // INFO: mozecie pomanipulowac polami boolowskimi i zobaczyc efekty
     userRepository.addUser(new BasicUserDetails(Arrays.asList(new SimpleGrantedAuthority("ADMIN")), passwordEncoder.encode("Password1"), "User1", true, true, true, true));
-    userRepository.addUser(new BasicUserDetails(Arrays.asList(new SimpleGrantedAuthority("USER")), passwordEncoder.encode("Password2"), "User2", true, true, true, true));
+    userRepository.addUser(new BasicUserDetails(Arrays.asList(new SimpleGrantedAuthority("FULL_ACCESS")), passwordEncoder.encode("Password2"), "User2", true, true, true, true));
     userRepository.addUser(new BasicUserDetails(Arrays.asList(new SimpleGrantedAuthority("ADMIN"), new SimpleGrantedAuthority("USER")), passwordEncoder.encode("Password3"), "User3", true, true, true, true));
     userRepository.addUser(new BasicUserDetails(Arrays.asList(new SimpleGrantedAuthority("FULL_ACCESS")), passwordEncoder.encode("Password4"), "User4", true, true, true, true));
     userRepository.addUser(new BasicUserDetails(new ArrayList<>(), passwordEncoder.encode("Password5"), "User5", true, true, true, true));

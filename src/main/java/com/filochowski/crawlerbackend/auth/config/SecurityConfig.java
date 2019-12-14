@@ -14,9 +14,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true) // INFO: aktywacja anotacji uzywanych w Controllerach
@@ -51,20 +48,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("http://localhost:3000");
-    configuration.addAllowedHeader("*");
-    configuration.setAllowCredentials(true);
-    configuration.addAllowedMethod("GET");
-    configuration.addAllowedMethod("PUT");
-    configuration.addAllowedMethod("POST");
-    source.registerCorsConfiguration("/**", configuration);
-    CorsFilter corsFilter = new CorsFilter(source);
-
     http
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
-        .addFilterBefore(corsFilter, LogoutFilter.class)
+        .addFilterBefore(new CorsFilter(), LogoutFilter.class)
         .headers()
         .cacheControl().and()
         .frameOptions().deny()
