@@ -1,5 +1,6 @@
 package com.filochowski.crawlerbackend.scrapper.model;
 
+import com.filochowski.crawlerbackend.scrapper.model.viewRequest.ScrappingRequestView;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,10 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ScrappingRequest {
+public class ListOfRequests {
 
-  String topic;
-  List<String> urls;
-  String username;
-  String comment;
+  List<ScrappingRequestView> scrappingRequestList;
+
 }

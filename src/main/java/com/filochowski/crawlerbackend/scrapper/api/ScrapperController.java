@@ -1,12 +1,13 @@
 package com.filochowski.crawlerbackend.scrapper.api;
 
+import com.filochowski.crawlerbackend.scrapper.model.ListOfRequests;
 import com.filochowski.crawlerbackend.scrapper.model.ScrappingModifyRequest;
 import com.filochowski.crawlerbackend.scrapper.model.ScrappingRequest;
 import com.filochowski.crawlerbackend.scrapper.model.ScrappingResponse;
 import com.filochowski.crawlerbackend.scrapper.service.ScrappingService;
+import com.filochowski.crawlerbackend.scrapper.service.ScrappingViewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,16 +25,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScrapperController {
 
   private final ScrappingService scrappingService;
+  private final ScrappingViewService scrappingViewService;
 
-  @PreAuthorize("hasAuthority('USER') or hasAuthority('FULL_ACCESS')")
   @PostMapping
   public ScrappingResponse addScrappingRequest(@RequestBody ScrappingRequest scrappingRequest){
     return scrappingService.handleScrappingRequest(scrappingRequest);
   }
 
   @GetMapping
-  public void getScrappingRequests() {
+  public ListOfRequests getScrappingRequests(@RequestParam String username) {
+    return scrappingViewService.viewRequests(username);
   }
+
+  // TODO:
 
   @DeleteMapping
   public void deleteRequest(@RequestParam String requestId) {

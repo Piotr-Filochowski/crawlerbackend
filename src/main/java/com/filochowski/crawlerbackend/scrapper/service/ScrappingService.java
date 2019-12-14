@@ -44,11 +44,12 @@ public class ScrappingService {
   }
 
   private RequestEntity saveRequestToDatabase(ScrappingRequest scrappingRequest) {
-    String username = getUsername();
-    log.info("username: " + username);
+//    String username = getUsername();
     RequestEntity requestEntity = new RequestEntity();
+    requestEntity.setUsername(scrappingRequest.getUsername());
     requestEntity.setRequestPositions(new LinkedList<>());
     requestEntity.setTopic(scrappingRequest.getTopic());
+    requestEntity.setComment(scrappingRequest.getComment());
     for (String url : scrappingRequest.getUrls()) {
       if (url.length() == 0 || url == null) {
         continue;

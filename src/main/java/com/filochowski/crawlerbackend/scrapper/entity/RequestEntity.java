@@ -34,6 +34,11 @@ public class RequestEntity {
   @OneToMany(mappedBy = "requestEntity", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<RequestPositionEntity> requestPositions;
 
+  @Column(name = "username")
+  private String username;
+
+  @Column(name = "comment")
+  private String comment;
 
   @PostConstruct
   private void postConstruct() {
